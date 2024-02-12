@@ -10,11 +10,44 @@ import {
   Button,
 } from '@nextui-org/react';
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { signIn, signOut, useSession } from 'next-auth/react';
+import axios from 'axios';
+
+const BACKEND_URL = 'http://localhost:4000';
 
 const Navigation = () => {
   const path = usePathname();
+  const router = useRouter(() => {});
   const { data: session } = useSession();
+
+  const checkSessionForUpload = () => {
+    if (!session) {
+      signIn();
+    } else {
+      router.push('/upload');
+    }
+  };
+
+  const testAPI = () => {
+    if (!session) {
+      signIn();
+      return;
+    }
+    axios
+      .get(BACKEND_URL + '/api/auth/test', {
+        headers: {
+          displayName: session.user.name,
+          email: session.user.email,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   return (
     <Navbar>
@@ -37,7 +70,7 @@ const Navigation = () => {
         </NavbarItem>
         <span>&nbsp;</span>
         <NavbarItem>
-          <Link color="foreground" href="/upload">
+          <Link color="foreground" onClick={testAPI}>
             <p
               className={
                 path === '/upload'
