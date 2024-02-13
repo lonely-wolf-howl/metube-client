@@ -12,9 +12,6 @@ import {
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import axios from 'axios';
-
-const BACKEND_URL = 'http://localhost:4000';
 
 const Navigation = () => {
   const path = usePathname();
@@ -27,26 +24,6 @@ const Navigation = () => {
     } else {
       router.push('/upload');
     }
-  };
-
-  const testAPI = () => {
-    if (!session) {
-      signIn();
-      return;
-    }
-    axios
-      .get(BACKEND_URL + '/api/auth/test', {
-        headers: {
-          displayName: session.user.name,
-          email: session.user.email,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
   };
 
   return (
@@ -70,7 +47,7 @@ const Navigation = () => {
         </NavbarItem>
         <span>&nbsp;</span>
         <NavbarItem>
-          <Link color="foreground" onClick={testAPI}>
+          <Link color="foreground" onClick={checkSessionForUpload}>
             <p
               className={
                 path === '/upload'
