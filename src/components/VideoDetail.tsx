@@ -16,6 +16,7 @@ import { BACKEND_URL } from '../app/(home)/page';
 const VideoDetail = ({ id }: { id: string }) => {
   const { data: session } = useSession();
   const [video, setVideo] = useState('loading');
+  const [downloadUrl, setDownloadUrl] = useState('');
 
   useEffect(() => {
     const getVideo = async () => {
@@ -25,13 +26,16 @@ const VideoDetail = ({ id }: { id: string }) => {
     getVideo();
   }, []);
 
-  const checkSessionForDownload = () => {
-    if (!session) {
-      signIn();
-    } else {
-      console.log('동영상 저장 중...');
-    }
-  };
+  useEffect(() => {
+    const createDownloadUrl = async () => {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/videos/${id}/download`
+      );
+      const url = URL.createObjectURL(new Blob([response.data]));
+      setDownloadUrl(url);
+    };
+    createDownloadUrl();
+  }, []);
 
   return (
     <div>
@@ -60,10 +64,19 @@ const VideoDetail = ({ id }: { id: string }) => {
               </small>
             </div>
             <div>
-              <Button radius="full" onClick={checkSessionForDownload}>
-                <IoMdDownload />
-                <span className="font-bold text-inherit">동영상 저장</span>
-              </Button>
+              {session ? (
+                <a href={downloadUrl} download={`${video.title}.mp4`}>
+                  <Button radius="full">
+                    <IoMdDownload />
+                    <span className="font-bold text-inherit">동영상 저장</span>
+                  </Button>
+                </a>
+              ) : (
+                <Button radius="full" onClick={() => signIn()}>
+                  <IoMdDownload />
+                  <span className="font-bold text-inherit">동영상 저장</span>
+                </Button>
+              )}
             </div>
           </CardHeader>
         </Card>
