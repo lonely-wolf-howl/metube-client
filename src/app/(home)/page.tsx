@@ -1,63 +1,54 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Video from '../../components/Video';
-import { Suspense } from 'react';
-import { CircularProgress } from '@nextui-org/react';
+import { Pagination } from '@nextui-org/react';
+import axios from 'axios';
+
+export const BACKEND_URL = 'http://localhost:4000';
 
 export default function Home() {
-  const mockVideos = [
-    {
-      id: 1,
-      title: '모두가 사랑하는 휴양지',
-      user: '영국남자',
-      viewCnt: 1,
-      source: '/videos/01.mp4',
-    },
-    {
-      id: 2,
-      title: '광활한 자연에 압도되다',
-      user: '코딩애플',
-      viewCnt: 2,
-      source: '/videos/02.mp4',
-    },
-    {
-      id: 3,
-      title: '카멜레온의 숨겨진 비밀',
-      user: '노마드 코더',
-      viewCnt: 3,
-      source: '/videos/03.mp4',
-    },
-    {
-      id: 4,
-      title: '일단 해봐',
-      user: '나이키 코리아',
-      viewCnt: 4,
-      source: '/videos/04.mp4',
-    },
-    {
-      id: 5,
-      title: '설원의 고양이들이 살아남는 법',
-      user: '미야옹철',
-      viewCnt: 5,
-      source: '/videos/05.mp4',
-    },
-  ];
+  const [page, setPage] = useState(1);
+  const [videos, setVideos] = useState([]);
+
+  useEffect(() => {
+    const getVideos = async () => {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/videos?page=${page}&size=${8}`
+      );
+      setVideos(response.data);
+    };
+    getVideos();
+  }, [page]);
 
   return (
-    <main className="flex justify-center items-center h-screen">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Suspense fallback={<CircularProgress aria-label="Loading..." />}>
-          {mockVideos.map((video) => (
-            <Video
-              key={video.id}
-              id={video.id}
-              title={video.title}
-              user={video.user}
-              viewCnt={video.viewCnt}
-              source={video.source}
-            />
-          ))}
-        </Suspense>
+    <main className="flex flex-col justify-center items-center h-screen">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-20">
+        {videos.map((video) => (
+          <Video
+            key={video.id}
+            id={video.id}
+            title={video.title}
+            user={video.displayName}
+            viewCount={video.viewCount}
+            source={video.source}
+          />
+        ))}
       </div>
+      {videos.length > 0 && (
+        <div className="mt-10">
+          <div className="flex flex-wrap gap-4 items-center">
+            <Pagination
+              key="bordered"
+              total={Math.ceil(videos.length / 8) + 1}
+              initialPage={1}
+              variant="bordered"
+              activepage={page}
+              onChange={(newPage) => setPage(newPage)}
+            />
+          </div>
+        </div>
+      )}
     </main>
   );
 }

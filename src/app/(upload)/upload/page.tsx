@@ -3,9 +3,8 @@
 import React, { useState } from 'react';
 import { Button, Input } from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
+import { BACKEND_URL } from '../../(home)/page';
 import axios from 'axios';
-
-const BACKEND_URL = 'http://localhost:4000';
 
 export default function Upload() {
   const { data: session } = useSession();
@@ -27,14 +26,13 @@ export default function Upload() {
 
   const UploadVideo = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    console.log(title);
 
     const formData = new FormData();
     formData.append('title', title);
     formData.append('video', e.target.files[0]);
 
     try {
-      const response = await axios.post(BACKEND_URL + '/api/videos', formData, {
+      const response = await axios.post(`${BACKEND_URL}/api/videos`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           displayname: encodeURIComponent(session.user.name),
