@@ -31,7 +31,9 @@ const VideoDetail = ({ id }: { id: string }) => {
       const response = await axios.get(
         `${BACKEND_URL}/api/videos/${id}/download`
       );
-      const url = URL.createObjectURL(new Blob([response.data]));
+      const url = URL.createObjectURL(
+        new Blob([response.data], { type: 'video/mp4' })
+      );
       setDownloadUrl(url);
     };
     createDownloadUrl();
