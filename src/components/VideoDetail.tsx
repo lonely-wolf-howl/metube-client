@@ -39,6 +39,12 @@ const VideoDetail = ({ id }: { id: string }) => {
     createDownloadUrl();
   }, []);
 
+  const increaseDownloadCount = async () => {
+    const response = await axios.post(
+      `${BACKEND_URL}/api/videos/${id}/download-count`
+    );
+  };
+
   return (
     <div>
       {video === 'loading' ? (
@@ -68,7 +74,7 @@ const VideoDetail = ({ id }: { id: string }) => {
             <div>
               {session ? (
                 <a href={downloadUrl} download={`${video.title}.mp4`}>
-                  <Button radius="full">
+                  <Button radius="full" onClick={increaseDownloadCount}>
                     <IoMdDownload />
                     <span className="font-bold text-inherit">동영상 저장</span>
                   </Button>

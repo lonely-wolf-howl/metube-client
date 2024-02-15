@@ -3,7 +3,8 @@
 import React from 'react';
 import { Card, CardHeader, CardBody } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import axios from 'axios';
+import { BACKEND_URL } from '../app/(home)/page';
 
 interface VideoProps {
   id: number;
@@ -16,13 +17,19 @@ interface VideoProps {
 const Video = ({ id, title, user, viewCount, source }: VideoProps) => {
   const router = useRouter(() => {});
 
-  const onClick = () => {
+  const handleOnClick = () => {
+    const increaseViewCount = async () => {
+      const response = await axios.post(
+        `${BACKEND_URL}/api/videos/${id}/view-count`
+      );
+    };
+    increaseViewCount();
     router.push(`/videos/${id}`);
   };
 
   return (
-    <Link href={`/videos/${id}`}>
-      <Card className="py-4">
+    <div onClick={handleOnClick}>
+      <Card className="py-4 cursor-pointer">
         <CardBody className="overflow-visible py-2">
           <video
             className="rounded-lg"
@@ -41,7 +48,7 @@ const Video = ({ id, title, user, viewCount, source }: VideoProps) => {
           </small>
         </CardHeader>
       </Card>
-    </Link>
+    </div>
   );
 };
 
