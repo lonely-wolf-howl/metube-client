@@ -14,7 +14,7 @@ export default function Upload() {
     event.preventDefault();
 
     if (title === '') {
-      alert('동영상 제목을 입력해 주세요.');
+      alert('Please enter the video title.');
       return;
     }
 
@@ -39,7 +39,7 @@ export default function Upload() {
           email: session.user.email,
         },
       });
-      console.log(response.data);
+      alert('Success.');
     } catch (error) {
       console.error(error);
     }
