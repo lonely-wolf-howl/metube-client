@@ -5,6 +5,7 @@ import { Button, Input } from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
 import { BACKEND_URL } from '../../(home)/page';
 import axios from 'axios';
+import CryptoJS from 'crypto-js';
 
 export default function Upload() {
   const { data: session } = useSession();
@@ -24,6 +25,15 @@ export default function Upload() {
     }
   };
 
+  const encrypt = (data) => {
+    const key = CryptoJS.enc.Utf8.parse(process.env.NEXT_PUBLIC_SECRET_KEY);
+    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+    return encryptedData.toString();
+  };
+
   const UploadVideo = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
@@ -31,12 +41,15 @@ export default function Upload() {
     formData.append('title', title);
     formData.append('video', e.target.files[0]);
 
+    const encryptedEmail = encrypt(session.user.email);
+    const encryptedUsername = encrypt(session.user.name);
+
     try {
       const response = await axios.post(`${BACKEND_URL}/api/videos`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          displayname: encodeURIComponent(session.user.name),
-          email: session.user.email,
+          displayname: encryptedUsername,
+          email: encryptedEmail,
         },
       });
       alert('요청 성공');
