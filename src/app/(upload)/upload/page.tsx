@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { Button, Input } from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
 import { BACKEND_URL } from '../../(home)/page';
@@ -15,7 +15,7 @@ export default function Upload() {
     event.preventDefault();
 
     if (title === '') {
-      alert('동영상 제목을 입력해 주세요');
+      alert('Please enter a video title');
       return;
     }
 
@@ -25,8 +25,8 @@ export default function Upload() {
     }
   };
 
-  const encrypt = (data) => {
-    const key = CryptoJS.enc.Utf8.parse(process.env.NEXT_PUBLIC_SECRET_KEY);
+  const encrypt = (data: any) => {
+    const key = CryptoJS.enc.Utf8.parse(process.env.NEXT_PUBLIC_SECRET_KEY as string);
     const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
       mode: CryptoJS.mode.ECB,
       padding: CryptoJS.pad.Pkcs7,
@@ -41,18 +41,18 @@ export default function Upload() {
     formData.append('title', title);
     formData.append('video', e.target.files[0]);
 
-    const encryptedEmail = encrypt(session.user.email);
-    const encryptedUsername = encrypt(session.user.name);
+    const encryptedEmail = encrypt(session?.user?.email);
+    const encryptedUsername = encrypt(session?.user?.name);
 
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/videos`, formData, {
+      await axios.post(`${BACKEND_URL}/api/videos`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           displayname: encryptedUsername,
           email: encryptedEmail,
         },
       });
-      alert('요청 성공');
+      alert('Request succeeded');
       window.location.reload();
     } catch (error) {
       console.error(error);
